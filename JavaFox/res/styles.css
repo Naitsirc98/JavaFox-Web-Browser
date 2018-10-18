@@ -1,0 +1,23 @@
+.tab-pane
+{
+    -fx-tab-min-width:200px;
+    -fx-tab-max-width:200px;
+}
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: #7F8C8D;
+}
+
+.tab{
+    -fx-background-insets: 0 1 0 2;
+}
+.tab-pane .tab
+{
+    -fx-background-color: #D7DBDD;
+
+}
+
+.tab-pane .tab:selected
+{
+    -fx-background-color: #F2F3F4 ;
+}
