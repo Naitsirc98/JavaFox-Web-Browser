@@ -118,8 +118,8 @@ public class WebTab extends Tab {
 		refresh = createButton(Icon.REFRESH, 20, 20, e-> engine.reload());
 
 		currentURL = new TextField();
-		currentURL.setPrefWidth(800);
-		currentURL.setMinWidth(200);
+		currentURL.setPrefWidth(widthOf(0.45));
+		currentURL.setMinWidth(widthOf(0.1));
 		currentURL.setFont(Font.font("Sans Seriff", 14));
 
 		currentURL.setOnAction(e -> {
@@ -141,11 +141,11 @@ public class WebTab extends Tab {
 		});
 		currentURL.setPromptText("Search with Google or enter address");
 
-		HBox.setMargin(currentURL, new Insets(0,100,0,10));
+		HBox.setMargin(currentURL, new Insets(0,widthOf(0.05),0,10));
 
 		search = new TextField();
-		search.setPrefWidth(400);
-		search.setMinWidth(80);
+		search.setPrefWidth(widthOf(0.2));
+		search.setMinWidth(widthOf(0.042));
 		search.setFont(Font.font("Sans Seriff", 14));
 		search.setOnAction(e -> {
 
@@ -154,7 +154,7 @@ public class WebTab extends Tab {
 		});
 		search.setPromptText("Search in Google");
 
-		HBox.setMargin(search, new Insets(0,100,0,0));
+		HBox.setMargin(search, new Insets(0,widthOf(0.05),0,0));
 
 		add = createButton(Icon.ADD, 20, 20, e -> JavaFox.getJavaFox().addTab());
 		add.setTooltip(new Tooltip("Create new tab"));
@@ -253,10 +253,6 @@ public class WebTab extends Tab {
 
 		});
 
-		engine.locationProperty().addListener(e -> {
-
-		});
-
 		history = engine.getHistory();
 
 		history.currentIndexProperty().addListener(e -> {
@@ -288,19 +284,15 @@ public class WebTab extends Tab {
 			return;
 		}
 
-		System.out.println("loading pdf");
+		System.out.println("Loading pdf...");
 
 		try(final InputStream stream = new URL(pdfLocation).openStream()) {
 			
 			pdfLocation = null;
+	
+			final byte[] data = stream.readAllBytes();
 
-			//I use IOUtils from org.​apache.​commons.​io
-			byte[] data = stream.readAllBytes();
-
-			//Base64 from java.util
 			String base64 = Base64.getEncoder().encodeToString(data);
-
-			// engine.executeScript("console.log = function(message){ java.log(message); };");
 
 			engine.executeScript("openFileFromBase64('"+base64+"')");
 
@@ -345,6 +337,14 @@ public class WebTab extends Tab {
 		
 		view.setZoom(view.getZoom()+factor);
 		
+	}
+	
+	private double widthOf(double percentage) {
+		return JavaFox.getJavaFox().getWidth() * percentage;
+	}
+	
+	private double heightOf(double percentage) {
+		return JavaFox.getJavaFox().getHeight() * percentage;
 	}
 
 }
