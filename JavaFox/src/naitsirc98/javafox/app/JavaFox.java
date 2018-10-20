@@ -9,6 +9,8 @@
 
 package naitsirc98.javafox.app;
 
+import java.util.List;
+
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
@@ -17,11 +19,12 @@ import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import naitsirc98.javafox.app.config.UserConfig;
-import naitsirc98.javafox.app.tabs.WebTab;
+import naitsirc98.javafox.app.gui.Toolbar;
+import naitsirc98.javafox.app.gui.tabs.WebTab;
 import naitsirc98.javafox.app.util.Icon;
 
 public class JavaFox extends Application {
@@ -42,6 +45,7 @@ public class JavaFox extends Application {
 	}
 	
 	private Stage window;
+	private Pane root;
 	private TabPane tabs;
 
 	public JavaFox() {
@@ -56,13 +60,11 @@ public class JavaFox extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 		
-		UserConfig.getConfig();
-		
 		window = stage;
 		
 		stage.setTitle("JavaFox");
 		
-		BorderPane root = new BorderPane();
+		root = new StackPane();
 		
 		tabs = new TabPane();
 		
@@ -70,7 +72,7 @@ public class JavaFox extends Application {
 		
 		tabs.getStylesheets().add(getClass().getResource("/styles.css").toString());
 		
-		root.setCenter(new StackPane(tabs));
+		root.getChildren().add(new StackPane(tabs));
 		
 		Scene scene = new Scene(root);
 		
@@ -95,9 +97,11 @@ public class JavaFox extends Application {
 		stage.setMinWidth(720);
 		stage.setMinHeight(600);
 		
+		stage.setOnCloseRequest(e -> exit());
+		
 		stage.show();
 		
-		tabs.getTabs().add(new WebTab());
+		addTab();
 		
 	}
 	
@@ -105,37 +109,77 @@ public class JavaFox extends Application {
 		
 		final WebTab tab = (WebTab) tabs.getSelectionModel().getSelectedItem();
 		
-		tab.zoom(zoomIn ? 0.1 : -0.1);
+		tab.zoom(zoomIn);
 
+	}
+	
+	public void select(Tab tab) {
+		tabs.getSelectionModel().select(tab);
+		Toolbar.getToolbar().setTab((WebTab) tab);
 	}
 
 	public void addTab() {
-		final Tab tab = new WebTab(null);
+		final WebTab tab = new WebTab();
 		tabs.getTabs().add(tab);
-		tabs.getSelectionModel().select(tab);
+		select(tab);
 	}
 	
-	public void closeSelectedTab() {
-
-		final WebTab tab = (WebTab) tabs.getSelectionModel().getSelectedItem();
+	public void closeTab(Tab tab) {
 		
 		tabs.getTabs().remove(tab);
 		
 		tab.getOnClosed().handle(null);
+		
+	}
+	
+	public void closeSelectedTab() {
+		closeTab(tabs.getSelectionModel().getSelectedItem());
+	}
+	
+	public void closeAllExcept(Tab tab) {
+		
+		tabs.getTabs().retainAll(tab);
+		
+		tabs.getSelectionModel().select(tab);
+		
+	}
+	
+	public void closeOnRight(Tab tab) {
+		
+		final int index = tabs.getTabs().indexOf(tab);
+		
+		final List<Tab> right = tabs.getTabs().subList(index+1, tabs.getTabs().size());
+		
+		right.forEach(e -> e.getOnClosed().handle(null));
+		
+		tabs.getTabs().removeAll(right);
+		
+	}
+	
+	public void closeOnLeft(Tab tab) {
+		
+		final int index = tabs.getTabs().indexOf(tab);
+		
+		final List<Tab> left = tabs.getTabs().subList(0, index);
+		
+		left.forEach(e -> e.getOnClosed().handle(null));
+		
+		tabs.getTabs().removeAll(left);
+		
 	}
 	
 	public int countTabs() {
 		return tabs.getTabs().size();
 	}
 	
-	
+
 	public void exit() {
 		
 		if(javafox == null) {
 			throw new IllegalStateException("JavaFox has not been initialized!");
 		}
 		
-		// ...
+		UserConfig.getConfig().save();
 		
 		System.exit(0);
 		
@@ -147,6 +191,14 @@ public class JavaFox extends Application {
 	
 	public double getHeight() {
 		return window.getHeight();
+	}
+	
+	public double widthOf(double percentage) {
+		return JavaFox.getJavaFox().getWidth() * percentage;
+	}
+
+	public double heightOf(double percentage) {
+		return JavaFox.getJavaFox().getHeight() * percentage;
 	}
 
 }
