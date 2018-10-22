@@ -93,9 +93,13 @@ public final class Download {
 			type.set(request.getValue()[1]);
 			size.set(Double.parseDouble(request.getValue()[2]));
 			
-			filename.set(new String(
-					content.substring(content.indexOf("\"")+1, content.lastIndexOf("\"")).getBytes(),
-					StandardCharsets.ISO_8859_1));
+			if(content != null) {
+				filename.set(new String(
+						content.substring(content.indexOf("\"")+1, content.lastIndexOf("\"")).getBytes(),
+						StandardCharsets.ISO_8859_1));
+			} else {
+				filename.set("(Could not retrieve filename)");
+			}
 			
 			final Alert dialog = new Alert(AlertType.CONFIRMATION);
 			

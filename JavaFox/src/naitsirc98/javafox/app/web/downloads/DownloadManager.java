@@ -22,7 +22,7 @@ public final class DownloadManager {
 		}
 		
 		return manager;
-		
+
 	}
 	
 	private final Deque<Download> downloads;

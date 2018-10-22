@@ -2,6 +2,9 @@ package naitsirc98.javafox.app.services;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -47,6 +50,8 @@ public class HTTPHeadRequestService extends Service<String[]> {
 		@Override
 		protected String[] call() throws Exception {
 			
+			Thread.setDefaultUncaughtExceptionHandler((t,e) -> e.printStackTrace());
+			
 			final HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
 			
 			connection.addRequestProperty("User-Agent", 
@@ -58,7 +63,7 @@ public class HTTPHeadRequestService extends Service<String[]> {
 			
 			if(fields[0].equals("all")) {
 				
-				result = (String[]) connection.getHeaderFields().values().toArray();
+				// TODO
 				
 			} else {
 				
