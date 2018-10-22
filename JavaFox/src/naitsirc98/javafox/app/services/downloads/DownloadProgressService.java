@@ -45,7 +45,7 @@ public class DownloadProgressService extends Service<Void> {
 				updateProgress(length, size);
 				updateMessage(message);
 				
-				System.out.println("message = "+message);
+				System.out.println(message);
 				
 				old = length;
 				

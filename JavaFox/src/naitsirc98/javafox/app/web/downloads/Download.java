@@ -1,6 +1,9 @@
-package naitsirc98.javafox.app.web;
+package naitsirc98.javafox.app.web.downloads;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -12,8 +15,7 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
-import naitsirc98.javafox.app.gui.DownloadView;
-import naitsirc98.javafox.app.gui.Toolbar;
+import naitsirc98.javafox.app.config.UserConfig;
 import naitsirc98.javafox.app.services.HTTPHeadRequestService;
 import naitsirc98.javafox.app.services.downloads.DownloadService;
 
@@ -80,6 +82,11 @@ public final class Download {
 
 		request.setOnSucceeded(e -> {
 			
+			if(request.getValue().length < 3) {
+				System.out.println("Download: couldn't get response");
+				return;
+			}
+			
 			System.out.println(Arrays.toString(request.getValue()));
 			
 			final String content = request.getValue()[0];
@@ -96,7 +103,7 @@ public final class Download {
 			
 			dialog.setHeaderText("Do you want to download this file?");
 			
-			dialog.setContentText(String.format("Type: %s; Size: %.2f MB", type, size.get()/1024/1024));
+			dialog.setContentText(String.format("Type: %s; Size: %.2f MB", type.get(), size.get()/1024/1024));
 			
 			dialog.showAndWait()
 			.filter(response -> response == ButtonType.OK)
@@ -109,10 +116,47 @@ public final class Download {
 
 	private void start(String url, String filename, double size) {
 		
-		service.set(new DownloadService(url, filename, size));
-
-		service.get().start();
+		final boolean confirmation = checkIfAlreadyExists(filename);
 		
+		if(confirmation) {
+			
+			System.out.println("Download started");
+			
+			DownloadManager.getManager().add(this);
+			
+			service.set(new DownloadService(url, filename, size));
+			
+			service.get().setOnSucceeded(e -> DownloadManager.getManager().remove(this));
+
+			service.get().start();
+			
+		} else {
+			System.out.println("Download cancelled");
+		}
+		
+
+	}
+	
+	private boolean checkIfAlreadyExists(String filename) {
+		
+		final Path path = Paths.get(UserConfig.getConfig().getString("downloads")+filename);
+		
+		if(!Files.exists(path)) {
+			return true;
+		}
+		
+		final Alert dialog = new Alert(AlertType.CONFIRMATION);
+		
+		dialog.getButtonTypes().clear();
+		dialog.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
+		
+		dialog.setTitle("File already exists at location "+path.getParent());
+		
+		dialog.setHeaderText("Do you want to overwrite this file?");
+	
+		final ButtonType response = dialog.showAndWait().get();
+		
+		return response == ButtonType.YES;
 	}
 
 }

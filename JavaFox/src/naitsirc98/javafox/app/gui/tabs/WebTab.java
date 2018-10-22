@@ -5,7 +5,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import naitsirc98.javafox.app.JavaFox;
 import naitsirc98.javafox.app.config.UserConfig;
-import naitsirc98.javafox.app.gui.Toolbar;
+import naitsirc98.javafox.app.gui.WebToolBar;
 import naitsirc98.javafox.app.web.WebManager;
 
 public class WebTab extends Tab {
@@ -37,15 +37,13 @@ public class WebTab extends Tab {
 		
 		root.setCenter(manager.getWebView());
 		
-		root.setTop(Toolbar.getToolbar());
+		root.setTop(WebToolBar.getToolBar());
 
 		setContent(root);
 
 		setOnClosed(e -> {
 			
 			manager.close();
-			
-			Toolbar.getToolbar().removeTab(this);
 
 			final JavaFox app = JavaFox.getJavaFox();
 
@@ -57,8 +55,8 @@ public class WebTab extends Tab {
 		
 		setOnSelectionChanged(e -> {
 			if(isSelected()) {
-				Toolbar.getToolbar().setTab(this);
-				root.setTop(Toolbar.getToolbar());
+				WebToolBar.getToolBar().setTab(this);
+				root.setTop(WebToolBar.getToolBar());
 			}
 		});
 

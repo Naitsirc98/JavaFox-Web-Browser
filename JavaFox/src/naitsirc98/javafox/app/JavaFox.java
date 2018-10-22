@@ -13,6 +13,9 @@ import java.util.List;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
@@ -22,10 +25,12 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import naitsirc98.javafox.app.config.UserConfig;
-import naitsirc98.javafox.app.gui.Toolbar;
+import naitsirc98.javafox.app.gui.WebToolBar;
 import naitsirc98.javafox.app.gui.tabs.WebTab;
 import naitsirc98.javafox.app.util.Icon;
+import naitsirc98.javafox.app.web.downloads.DownloadManager;
 
 public class JavaFox extends Application {
 	
@@ -97,7 +102,10 @@ public class JavaFox extends Application {
 		stage.setMinWidth(720);
 		stage.setMinHeight(600);
 		
-		stage.setOnCloseRequest(e -> exit());
+		stage.setOnCloseRequest(e -> {
+			exit();
+			e.consume();
+		});
 		
 		stage.show();
 		
@@ -115,7 +123,7 @@ public class JavaFox extends Application {
 	
 	public void select(Tab tab) {
 		tabs.getSelectionModel().select(tab);
-		Toolbar.getToolbar().setTab((WebTab) tab);
+		WebToolBar.getToolBar().setTab((WebTab) tab);
 	}
 
 	public void addTab() {
@@ -171,12 +179,31 @@ public class JavaFox extends Application {
 	public int countTabs() {
 		return tabs.getTabs().size();
 	}
-	
 
+	
 	public void exit() {
 		
 		if(javafox == null) {
 			throw new IllegalStateException("JavaFox has not been initialized!");
+		}
+		
+		DownloadManager dm = DownloadManager.getManager();
+		
+		final int pendingDownloads = dm.pendingDownloads();
+		
+		if(pendingDownloads > 0) {
+			
+			Alert alert = new Alert(AlertType.CONFIRMATION);
+			alert.getButtonTypes().clear();
+			alert.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
+			alert.setTitle("There are downloads pending");
+			alert.setHeaderText("You are downloading "+pendingDownloads+(pendingDownloads>1?" files":" file"));
+			alert.setContentText("Are you sure to quit and cancel those downloads?");
+			
+			if(alert.showAndWait().get() != ButtonType.YES) {
+				return;
+			}
+			
 		}
 		
 		UserConfig.getConfig().save();

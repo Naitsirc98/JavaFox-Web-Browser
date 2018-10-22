@@ -12,7 +12,8 @@ public enum Icon {
 	FORWARD("forward.png"),
 	ADD("add.png"),
 	REFRESH("refresh.png"),
-	HOME("home.png");
+	HOME("home.png"),
+	AUDIO("audio_icon.png");
 
 
 	private final Image image;

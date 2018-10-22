@@ -19,5 +19,12 @@ public class IconUtils {
 		button.setGraphic(view);
 
 	}
+	
+	public static Icon getIconFor(final String fileType) {
+		
+		// TODO
+		
+		return Icon.AUDIO;
+	}
 
 }

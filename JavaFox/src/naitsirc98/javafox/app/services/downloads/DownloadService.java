@@ -13,7 +13,7 @@ import naitsirc98.javafox.app.config.UserConfig;
 
 public final class DownloadService extends Service<Void> {
 	
-	private final DownloadProgressService downloadProgress = new DownloadProgressService();
+	private final DownloadProgressService downloadProgress;
 	
 	private final String url;
 	private final String filename;
@@ -23,6 +23,7 @@ public final class DownloadService extends Service<Void> {
 		this.url = url;
 		this.filename = filename;
 		this.size = size;
+		downloadProgress = new DownloadProgressService();
 	}
 	
 	public DownloadProgressService getProgressService() {
@@ -38,6 +39,10 @@ public final class DownloadService extends Service<Void> {
 
 		@Override
 		protected Void call() throws Exception {
+			
+			downloadProgress.messageProperty().addListener((observable, old, neww) -> {
+				updateMessage(neww);
+			});
 			
 			System.out.println("downloading = "+filename);
 			
@@ -59,6 +64,10 @@ public final class DownloadService extends Service<Void> {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			
+			updateMessage("Download complete");
+			
+			updateProgress(1, 1);
 			
 			System.out.println("file downloaded as location "+path);
 			

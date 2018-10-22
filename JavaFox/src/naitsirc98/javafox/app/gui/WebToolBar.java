@@ -1,15 +1,11 @@
 package naitsirc98.javafox.app.gui;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
@@ -22,32 +18,30 @@ import naitsirc98.javafox.app.config.UserConfig;
 import naitsirc98.javafox.app.gui.tabs.WebTab;
 import naitsirc98.javafox.app.util.Icon;
 import naitsirc98.javafox.app.web.WebManager;
+import naitsirc98.javafox.app.web.downloads.DownloadManager;
 
-public class Toolbar extends VBox {
+public class WebToolBar extends VBox {
 
-	private static Toolbar toolbar;
+	private static WebToolBar toolbar;
 
-	public static Toolbar getToolbar() {
+	public static WebToolBar getToolBar() {
 
 		if(toolbar == null) {
-			toolbar = new Toolbar();
+			toolbar = new WebToolBar();
 		}
 
 		return toolbar;
 	}
-	
-	private final List<WebTab> initializedTabs;
 
 	private Button back, forward, add, refresh, home;
 	private TextField currentURL, search;
 	private Label zoomLabel;
-	private Menu downloads;
+	private Button downloads;
 	private ProgressBar progress;
 
 	private WebTab selectedTab;
 
-	private Toolbar() {
-		initializedTabs = new ArrayList<>();
+	private WebToolBar() {
 		setCache(true);
 		setAlignment(Pos.TOP_CENTER);
 		createWidgets();
@@ -58,50 +52,39 @@ public class Toolbar extends VBox {
 		if(selectedTab == tab) {
 			return;
 		}
-		
-		initTab(tab);
 
 		checkHistoryButtons(tab.getManager());
 
 		search.setText(tab.getManager().getLastSearchedURL());
 
 		currentURL.setText(tab.getManager().getEngine().getLocation());
+		
+		zoomLabel.setText("Zoom: "+((int)(tab.getManager().getWebView().getZoom()*100))+"%");
+		
+		manageProperties(tab.getManager());
 
 		selectedTab = tab;
 
 	}
-	
+
 	public void setZoomValue(double zoom) {
 		zoomLabel.setText("Zoom: "+((int)(zoom*100))+"%");
 	}
-	
-	public void removeTab(WebTab tab) {
-		initializedTabs.remove(tab);
-	}
 
 
-	private void initTab(WebTab tab) {
-		
-		// Tab is already initialized?
-		if(initializedTabs.contains(tab)) {
-			return;
-		}
-		
-		initializedTabs.add(tab);
-		
-		WebManager manager = tab.getManager();
+	private void init() {
 
 		back.setOnAction(e -> {
-			manager.decRelativeIndex();
-			manager.getHistory().go(-1);
+			selectedTab.getManager().decRelativeIndex();
+			selectedTab.getManager().getHistory().go(-1);
 		});
 
 		forward.setOnAction(e -> {
-			manager.incRelativeIndex();
-			manager.getHistory().go(1);
+			selectedTab.getManager().incRelativeIndex();
+			selectedTab.getManager().getHistory().go(1);
 		});
 
-		refresh.setOnAction(e-> manager.getEngine().reload());
+		refresh.setOnAction(e-> selectedTab.getManager().getEngine().reload());
 
 		currentURL.setOnAction(e -> {
 
@@ -112,28 +95,27 @@ public class Toolbar extends VBox {
 			} catch (Exception ex) {
 				url = tryResolve(url);
 			} finally {
-				manager.getEngine().load(url);
+				selectedTab.getManager().getEngine().load(url);
 			}
 
 		});
 
 		search.setOnAction(e -> {
 
-			manager.setLastSearchedURL(search.getText());
-			manager.getEngine().load(tryResolve(search.getText()));
+			selectedTab.getManager().setLastSearchedURL(search.getText());
+			selectedTab.getManager().getEngine().load(tryResolve(search.getText()));
 
 		});
 
 		add.setOnAction(e -> JavaFox.getJavaFox().addTab());
 
-		home.setOnAction(e -> manager.getEngine().load(UserConfig.getConfig().getString("mainPage")));
+		home.setOnAction(e -> selectedTab.getManager().getEngine().load(UserConfig
+				.getConfig().getString("mainPage")));
 
-		manageProperties(manager);
-		
 	}
 
 	private void manageProperties(WebManager manager) {
-		
+
 		progress.progressProperty().unbind();
 
 		progress.setProgress(manager.getEngine().getLoadWorker().getProgress());
@@ -142,11 +124,11 @@ public class Toolbar extends VBox {
 
 		manager.getEngine().locationProperty().addListener((observable, oldValue, newValue) -> {
 
-			
+
 			if(newValue.startsWith("file:")) {
 				return;
 			}
-			
+
 			manager.getTab().setText(manager.getTitle());
 			currentURL.setText(newValue);
 
@@ -170,7 +152,7 @@ public class Toolbar extends VBox {
 	}
 
 	private void createWidgets() {
-		
+
 		JavaFox javafox = JavaFox.getJavaFox();
 
 		HBox widgets = new HBox();
@@ -204,7 +186,7 @@ public class Toolbar extends VBox {
 
 		search.setPromptText("Search in Google");
 
-		HBox.setMargin(search, new Insets(0,javafox.widthOf(0.05),0,0));
+		HBox.setMargin(search, new Insets(0,javafox.widthOf(0.02),0,0));
 
 		add = createButton(Icon.ADD, 20, 20);
 		add.setTooltip(new Tooltip("Create new manager"));
@@ -231,12 +213,16 @@ public class Toolbar extends VBox {
 			progress.setVisible(progress.getProgress() < 1.0);
 
 		});
+
+		downloads = new Button("Downloads");
 		
-		// downloads = new Menu();
-		
-		widgets.getChildren().addAll(back, forward, refresh, add, home, currentURL, search, zoomLabel);
+		downloads.setOnAction(e -> DownloadManager.getManager().display());
+
+		widgets.getChildren().addAll(back, forward, refresh, add, home, currentURL, search, zoomLabel, downloads);
 
 		getChildren().addAll(widgets, progress);
+		
+		init();
 
 	}
 
@@ -255,10 +241,6 @@ public class Toolbar extends VBox {
 
 	private String tryResolve(String text) {
 		return UserConfig.getConfig().getString("mainPage")+"/search?q=" + text.trim();
-	}
-	
-	public void addDownload(DownloadView dw) {
-		downloads.getItems().add(dw);
 	}
 
 

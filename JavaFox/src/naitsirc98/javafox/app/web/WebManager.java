@@ -15,6 +15,7 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebView;
 import naitsirc98.javafox.app.gui.tabs.WebTab;
+import naitsirc98.javafox.app.web.downloads.Download;
 
 public class WebManager {
 	
@@ -93,12 +94,6 @@ public class WebManager {
 		} else {
 			
 			Download.newDownload(engine.getLocation());
-			
-			/*final DownloadService downloader = new DownloadService();
-			
-			downloader.urlProperty().set(engine.getLocation());
-			
-			downloader.start();*/
 			
 		}
 		
