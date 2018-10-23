@@ -25,7 +25,6 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import naitsirc98.javafox.app.config.UserConfig;
 import naitsirc98.javafox.app.gui.WebToolBar;
 import naitsirc98.javafox.app.gui.tabs.WebTab;

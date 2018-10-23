@@ -2,11 +2,9 @@ package naitsirc98.javafox.app.web.downloads;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.ReadOnlyDoubleWrapper;
@@ -25,6 +23,8 @@ import naitsirc98.javafox.app.services.downloads.DownloadService;
 public final class Download {
 	
 	public static void newDownload(final String url) {
+		
+		System.out.println("url = "+url);
 		
 		final Download download = new Download();
 		
@@ -96,8 +96,8 @@ public final class Download {
 		
 		request.setOnSucceeded(e -> {
 			
-			if(Arrays.stream(request.getValue()).allMatch(s -> s == null)) {
-				System.out.println("Download: couldn't get response");
+			if(request.getValue()[2] == null) {
+				System.out.println("Cannot download file: couldn't retrieve file size");
 				return;
 			}
 			
@@ -112,7 +112,7 @@ public final class Download {
 						content.substring(content.indexOf("\"")+1, content.lastIndexOf("\"")).getBytes(),
 						StandardCharsets.ISO_8859_1));
 			} else {
-				filename.set("(Could not retrieve filename)");
+				filename.set(url.substring(url.lastIndexOf('/'), url.length()));
 			}
 			
 			final Alert dialog = new Alert(AlertType.CONFIRMATION);
