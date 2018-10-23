@@ -16,11 +16,7 @@ public class DownloadView extends GridPane {
 	private GridPane info;
 	private final Button options;
 	
-	private final Download download;
-	
 	public DownloadView(Download download) {
-		
-		this.download = download;
 		
 		Label name = new Label("File: "+download.getFilename());
 		
@@ -43,6 +39,8 @@ public class DownloadView extends GridPane {
 		icon.setFitHeight(32);
 		
 		options = new Button("Cancel");
+		
+		options.setOnAction(e -> download.cancel());
 		
 		add(name, 1, 0);
 		

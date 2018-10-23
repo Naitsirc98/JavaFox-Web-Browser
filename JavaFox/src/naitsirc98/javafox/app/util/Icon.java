@@ -13,6 +13,7 @@ public enum Icon {
 	ADD("add.png"),
 	REFRESH("refresh.png"),
 	HOME("home.png"),
+	DOWNLOADS("downloads.png"),
 	AUDIO("audio_icon.png");
 
 
@@ -34,7 +35,7 @@ public enum Icon {
 	
 	private static String getPath(String relativePath) {
 		
-		final URL url = Icon.class.getResource("/"+relativePath);
+		final URL url = Icon.class.getResource("/icons/"+relativePath);
 		
 		if(url == null) {
 			try {

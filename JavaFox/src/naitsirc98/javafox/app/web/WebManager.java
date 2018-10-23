@@ -19,10 +19,12 @@ import naitsirc98.javafox.app.web.downloads.Download;
 
 public class WebManager {
 	
-	private static final String PDF_VIEWER = WebTab.class
+	private static final String PDF_VIEWER = WebManager.class
 			.getResource("/pdfjs-1.9.426-dist/web/viewer.html").toExternalForm();
-	private static final String PDF_VIEW_STYLE = WebTab.class
+	private static final String PDF_VIEW_STYLE = WebManager.class
 			.getResource("/pdfjs-1.9.426-dist/web/viewer.css").toExternalForm();
+	private static final String NO_CONNECTION = WebManager.class
+			.getResource("/pages/no_connection.html").toExternalForm();
 
 	private final WebTab tab;
 	
@@ -59,7 +61,7 @@ public class WebManager {
 				checkCancelReason();
 				break;
 			case FAILED:
-				engine.load(new File("no_connection.html").toURI().toString());
+				engine.load(NO_CONNECTION);
 				break;
 			case READY:
 				break;

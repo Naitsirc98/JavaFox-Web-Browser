@@ -3,9 +3,12 @@ package naitsirc98.javafox.app.web.downloads;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
+import naitsirc98.javafox.app.gui.WebToolBar;
 import naitsirc98.javafox.app.gui.downloads.DownloadView;
 
 public final class DownloadManager {
@@ -33,19 +36,22 @@ public final class DownloadManager {
 	
 	public void add(final Download download) {
 		downloads.push(download);
+		WebToolBar.getToolBar().enableDownloadsButton();
 	}
 	
 	public void remove(final Download download) {
 		downloads.remove(download);
 	}
 	
-	public int pendingDownloads() {
-		return downloads.size();
+	public long pendingDownloads() {
+		return downloads.stream().filter(d -> !d.isComplete()).count();
 	}
 	
-	public void display() {
+	public void display(double x, double y) {
 		
 		Stage window = new Stage();
+		
+		window.setTitle("Downloads");
 		
 		ListView<DownloadView> view = new ListView<>();
 		
@@ -62,6 +68,9 @@ public final class DownloadManager {
 		window.setScene(scene);
 		
 		window.sizeToScene();
+		
+		window.setX(x-300);
+		window.setY(y+85);
 		
 		window.show();
 		

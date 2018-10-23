@@ -17,6 +17,7 @@ import naitsirc98.javafox.app.JavaFox;
 import naitsirc98.javafox.app.config.UserConfig;
 import naitsirc98.javafox.app.gui.tabs.WebTab;
 import naitsirc98.javafox.app.util.Icon;
+import naitsirc98.javafox.app.util.IconUtils;
 import naitsirc98.javafox.app.web.WebManager;
 import naitsirc98.javafox.app.web.downloads.DownloadManager;
 
@@ -69,6 +70,10 @@ public class WebToolBar extends VBox {
 
 	public void setZoomValue(double zoom) {
 		zoomLabel.setText("Zoom: "+((int)(zoom*100))+"%");
+	}
+	
+	public void enableDownloadsButton() {
+		downloads.setDisable(false);
 	}
 
 
@@ -176,8 +181,7 @@ public class WebToolBar extends VBox {
 
 		currentURL.setPromptText("Search with Google or enter address");
 
-
-		HBox.setMargin(currentURL, new Insets(0,javafox.widthOf(0.05),0,10));
+		HBox.setMargin(currentURL, new Insets(0,javafox.widthOf(0.03),0,10));
 
 		search = new TextField();
 		search.setPrefWidth(javafox.widthOf(0.2));
@@ -194,9 +198,10 @@ public class WebToolBar extends VBox {
 		home = createButton(Icon.HOME, 20, 20);
 		home.setTooltip(new Tooltip("Go to the main page"));
 
-
 		zoomLabel = new Label("Zoom: 100%");
 		zoomLabel.setStyle("-fx-background-color: lightgray;");
+		
+		HBox.setMargin(zoomLabel, new Insets(0,javafox.widthOf(0.02),0,0));
 
 		progress = new ProgressBar();
 
@@ -214,9 +219,18 @@ public class WebToolBar extends VBox {
 
 		});
 
-		downloads = new Button("Downloads");
+		downloads = new Button();
 		
-		downloads.setOnAction(e -> DownloadManager.getManager().display());
+		IconUtils.setGraphic(downloads, Icon.DOWNLOADS);
+		
+		downloads.setOnAction(e -> {
+			
+			DownloadManager.getManager().display(
+					downloads.getLayoutX(),downloads.getLayoutY());
+			
+		});
+		
+		downloads.setDisable(true);
 
 		widgets.getChildren().addAll(back, forward, refresh, add, home, currentURL, search, zoomLabel, downloads);
 

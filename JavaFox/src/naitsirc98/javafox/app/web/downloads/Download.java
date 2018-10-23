@@ -1,10 +1,12 @@
 package naitsirc98.javafox.app.web.downloads;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.ReadOnlyDoubleWrapper;
@@ -12,6 +14,7 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.concurrent.Worker.State;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
@@ -27,8 +30,6 @@ public final class Download {
 		
 		download.sendRequest(url);
 		
-		// Toolbar.getToolbar().addDownload(new DownloadView(download));
-		
 	}
 	
 	private final ReadOnlyStringWrapper filename = new ReadOnlyStringWrapper(this, "filename");
@@ -39,6 +40,11 @@ public final class Download {
 
 	private Download() {
 		
+	}
+	
+	public void cancel() {
+		service.get().cancel();
+		new File(getFullFilename()).delete();
 	}
 	
 	public ReadOnlyObjectProperty<DownloadService> serviceProperty() {
@@ -64,6 +70,10 @@ public final class Download {
 	public String getFilename() {
 		return filename.get();
 	}
+	
+	public String getFullFilename() {
+		return UserConfig.getConfig().getString("downloads") + filename.get();
+	}
 
 	public String getType() {
 		return type.get();
@@ -72,6 +82,10 @@ public final class Download {
 	public double getSize() {
 		return size.get();
 	}
+	
+	public boolean isComplete() {
+		return service.get().getState() == State.SUCCEEDED;
+	}
 
 
 	private void sendRequest(String url) {
@@ -79,10 +93,10 @@ public final class Download {
 		final HTTPHeadRequestService request = new HTTPHeadRequestService();
 
 		request.start(url, "Content-Disposition", "Content-Type", "Content-Length");
-
+		
 		request.setOnSucceeded(e -> {
 			
-			if(request.getValue().length < 3) {
+			if(Arrays.stream(request.getValue()).allMatch(s -> s == null)) {
 				System.out.println("Download: couldn't get response");
 				return;
 			}
@@ -120,47 +134,42 @@ public final class Download {
 
 	private void start(String url, String filename, double size) {
 		
-		final boolean confirmation = checkIfAlreadyExists(filename);
+		System.out.println("Download started");
 		
-		if(confirmation) {
-			
-			System.out.println("Download started");
-			
-			DownloadManager.getManager().add(this);
-			
-			service.set(new DownloadService(url, filename, size));
-			
-			service.get().setOnSucceeded(e -> DownloadManager.getManager().remove(this));
-
-			service.get().start();
-			
-		} else {
-			System.out.println("Download cancelled");
-		}
+		checkIfAlreadyExists(filename);
 		
+		DownloadManager.getManager().add(this);
+		
+		service.set(new DownloadService(url, this.filename.get(), size));
+		
+		// service.get().setOnSucceeded(e -> DownloadManager.getManager().remove(this));
 
+		service.get().start();
 	}
 	
-	private boolean checkIfAlreadyExists(String filename) {
+	private void checkIfAlreadyExists(final String filename) {
 		
-		final Path path = Paths.get(UserConfig.getConfig().getString("downloads")+filename);
+		final Path path = Paths.get(getFullFilename());
 		
-		if(!Files.exists(path)) {
-			return true;
+		final File directory = path.getParent().toFile();
+		
+		System.out.println("f="+filename);
+		
+		System.out.println(path.getParent().toFile());
+		
+		final File[] matches = directory.listFiles((f,n) 
+				-> n.startsWith(filename));
+		
+		if(matches.length == 0) {
+			return;
 		}
 		
-		final Alert dialog = new Alert(AlertType.CONFIRMATION);
+		final String extension = filename.substring(filename.lastIndexOf('.'));
 		
-		dialog.getButtonTypes().clear();
-		dialog.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
+		String name = filename.substring(0,filename.lastIndexOf('.'));
 		
-		dialog.setTitle("File already exists at location "+path.getParent());
+		this.filename.set(name+"("+matches.length+")"+extension);
 		
-		dialog.setHeaderText("Do you want to overwrite this file?");
-	
-		final ButtonType response = dialog.showAndWait().get();
-		
-		return response == ButtonType.YES;
 	}
 
 }

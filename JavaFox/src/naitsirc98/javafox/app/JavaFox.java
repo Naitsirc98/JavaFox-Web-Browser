@@ -74,8 +74,8 @@ public class JavaFox extends Application {
 		tabs = new TabPane();
 		
 		tabs.setTabClosingPolicy(TabClosingPolicy.ALL_TABS);
-		
-		tabs.getStylesheets().add(getClass().getResource("/styles.css").toString());
+
+		tabs.getStylesheets().add(JavaFox.class.getResource("/css/styles.css").toExternalForm());
 		
 		root.getChildren().add(new StackPane(tabs));
 		
@@ -189,7 +189,7 @@ public class JavaFox extends Application {
 		
 		DownloadManager dm = DownloadManager.getManager();
 		
-		final int pendingDownloads = dm.pendingDownloads();
+		final long pendingDownloads = dm.pendingDownloads();
 		
 		if(pendingDownloads > 0) {
 			
