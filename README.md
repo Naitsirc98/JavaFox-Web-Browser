@@ -1,5 +1,5 @@
 # JavaFox-Web-Browser
-A simple web browser made in JavaFX.
+A simple web browser made in JavaFX. The icons I use are from www.flaticon.com.
 
 Features:
 - Navigable multitab view
@@ -9,4 +9,6 @@ Features:
 Alert dialogs added when:
 - You try to exit the application while there are downloads still in progress
 
-Improvements: now you can see a list of your downloads and its state by clicking on the 'Downloads' button in the ToolBar.
+Improvements:
+
+- Now you can see a list of your downloads and its state by clicking on the 'Downloads' button in the ToolBar.
