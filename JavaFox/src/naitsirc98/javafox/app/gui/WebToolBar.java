@@ -2,9 +2,13 @@ package naitsirc98.javafox.app.gui;
 
 import java.net.URI;
 
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -14,10 +18,15 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.Stage;
+import javafx.util.Pair;
 import naitsirc98.javafox.app.JavaFox;
+import naitsirc98.javafox.app.gui.dialogs.BookmarkDialog;
 import naitsirc98.javafox.app.gui.tabs.WebTab;
 import naitsirc98.javafox.app.user.bookmarks.Bookmarks;
 import naitsirc98.javafox.app.user.config.UserConfig;
@@ -188,11 +197,8 @@ public class WebToolBar extends VBox {
 		currentURL.setPromptText("Search with Google or enter address");
 		
 		addBookmark = createButton(Icon.BOOKMARKS, 20, 20);
-		addBookmark.setOnAction(e -> {
-			
-			// TODO (dialog, etc)
-			
-		});
+		
+		addBookmark.setOnAction(e -> showAddBookmarkDialog());
 
 		HBox.setMargin(addBookmark, new Insets(0,javafox.widthOf(0.03),0,10));
 
@@ -251,7 +257,7 @@ public class WebToolBar extends VBox {
 		
 		updateBookmarksMenu(bookmarks);
 		
-		bookmarks.setOnAction(e -> updateBookmarksMenu(bookmarks));
+		bookmarks.setOnShowing(e -> updateBookmarksMenu(bookmarks));
 		
 		menu.getItems().add(bookmarks);
 		
@@ -268,6 +274,14 @@ public class WebToolBar extends VBox {
 
 	}
 	
+	private void showAddBookmarkDialog() {
+		
+		final BookmarkDialog dialog = new BookmarkDialog(selectedTab.getText(), currentURL.getText());
+
+		dialog.showAndWait().ifPresent(args -> Bookmarks.getBookmarks().put(args.getKey(), args.getValue()));
+
+	}
+
 	private void updateBookmarksMenu(Menu bookmarks) {
 		
 		Bookmarks bm = Bookmarks.getBookmarks();

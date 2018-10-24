@@ -59,6 +59,10 @@ public class HTTPHeadRequestService extends Service<String[]> {
 			
 			connection.setRequestMethod("HEAD");
 			
+			/*connection.getHeaderFields().forEach((k,v) -> {
+				System.out.println(k+" = "+v);
+			});*/
+			
 			String[] result = null;
 			
 			if(fields[0].equals("all")) {
