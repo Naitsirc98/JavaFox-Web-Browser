@@ -1,10 +1,10 @@
-package naitsirc98.javafox.app.config.history;
+package naitsirc98.javafox.app.user.history;
 
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-import naitsirc98.javafox.app.config.UserConfig;
+import naitsirc98.javafox.app.user.config.UserConfig;
 
 public class History {
 

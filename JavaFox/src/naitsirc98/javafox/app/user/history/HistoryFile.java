@@ -1,4 +1,4 @@
-package naitsirc98.javafox.app.config.history;
+package naitsirc98.javafox.app.user.history;
 
 import java.io.IOException;
 import java.io.InputStream;

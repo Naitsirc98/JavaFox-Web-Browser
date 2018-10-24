@@ -9,7 +9,7 @@ import java.nio.channels.ReadableByteChannel;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import naitsirc98.javafox.app.config.UserConfig;
+import naitsirc98.javafox.app.user.config.UserConfig;
 
 public final class DownloadService extends Service<Void> {
 	
@@ -24,10 +24,20 @@ public final class DownloadService extends Service<Void> {
 		this.filename = filename;
 		this.size = size;
 		downloadProgress = new DownloadProgressService();
+		setOnCancelled(e -> System.out.println("Download cancelled"));
+		setOnSucceeded(e -> System.out.println("Download complete"));
 	}
 	
 	public DownloadProgressService getProgressService() {
 		return downloadProgress;
+	}
+	
+	@Override
+	public boolean cancel() {
+		if(downloadProgress != null) {
+			downloadProgress.cancel();
+		}
+		return super.cancel();
 	}
 	
 	@Override
@@ -36,6 +46,13 @@ public final class DownloadService extends Service<Void> {
 	}
 	
 	private class DownloadTask extends Task<Void> {
+		
+		public DownloadTask() {
+			setOnScheduled(e -> updateMessage("Preparing for download..."));
+			setOnCancelled(e -> updateMessage("Download cancelled"));
+			setOnFailed(e -> updateMessage("Download failed"));
+			setOnSucceeded(e -> updateMessage("Download complete"));
+		}
 
 		@Override
 		protected Void call() throws Exception {
@@ -64,13 +81,7 @@ public final class DownloadService extends Service<Void> {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
-			updateMessage("Download complete");
-			
-			updateProgress(1, 1);
-			
-			System.out.println("file downloaded as location "+path);
-			
+
 			return null;
 		}
 

@@ -4,8 +4,8 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import naitsirc98.javafox.app.JavaFox;
-import naitsirc98.javafox.app.config.UserConfig;
 import naitsirc98.javafox.app.gui.WebToolBar;
+import naitsirc98.javafox.app.user.config.UserConfig;
 import naitsirc98.javafox.app.web.WebManager;
 
 public class WebTab extends Tab {

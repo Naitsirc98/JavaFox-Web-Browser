@@ -1,4 +1,4 @@
-package naitsirc98.javafox.app.config;
+package naitsirc98.javafox.app.user.config;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -14,7 +14,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import naitsirc98.javafox.app.config.history.HistoryFile;
+import naitsirc98.javafox.app.user.history.HistoryFile;
 
 public final class UserConfig {
 

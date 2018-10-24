@@ -14,7 +14,9 @@ public enum Icon {
 	REFRESH("refresh.png"),
 	HOME("home.png"),
 	DOWNLOADS("downloads.png"),
-	AUDIO("audio_icon.png");
+	AUDIO("audio_icon.png"),
+	MENU("menu.png"),
+	BOOKMARKS("star.png");
 
 
 	private final Image image;

@@ -5,7 +5,11 @@ import java.net.URI;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
@@ -14,8 +18,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import naitsirc98.javafox.app.JavaFox;
-import naitsirc98.javafox.app.config.UserConfig;
 import naitsirc98.javafox.app.gui.tabs.WebTab;
+import naitsirc98.javafox.app.user.bookmarks.Bookmarks;
+import naitsirc98.javafox.app.user.config.UserConfig;
 import naitsirc98.javafox.app.util.Icon;
 import naitsirc98.javafox.app.util.IconUtils;
 import naitsirc98.javafox.app.web.WebManager;
@@ -38,6 +43,8 @@ public class WebToolBar extends VBox {
 	private TextField currentURL, search;
 	private Label zoomLabel;
 	private Button downloads;
+	private Menu menu;
+	private Button addBookmark;
 	private ProgressBar progress;
 
 	private WebTab selectedTab;
@@ -168,7 +175,6 @@ public class WebToolBar extends VBox {
 		back = createButton(Icon.BACK, 20,20);
 		back.setDisable(true);
 
-
 		forward = createButton(Icon.FORWARD, 20, 20);
 		forward.setDisable(true);
 
@@ -180,8 +186,15 @@ public class WebToolBar extends VBox {
 		currentURL.setFont(Font.font("Sans Seriff", 14));
 
 		currentURL.setPromptText("Search with Google or enter address");
+		
+		addBookmark = createButton(Icon.BOOKMARKS, 20, 20);
+		addBookmark.setOnAction(e -> {
+			
+			// TODO (dialog, etc)
+			
+		});
 
-		HBox.setMargin(currentURL, new Insets(0,javafox.widthOf(0.03),0,10));
+		HBox.setMargin(addBookmark, new Insets(0,javafox.widthOf(0.03),0,10));
 
 		search = new TextField();
 		search.setPrefWidth(javafox.widthOf(0.2));
@@ -193,7 +206,7 @@ public class WebToolBar extends VBox {
 		HBox.setMargin(search, new Insets(0,javafox.widthOf(0.02),0,0));
 
 		add = createButton(Icon.ADD, 20, 20);
-		add.setTooltip(new Tooltip("Create new manager"));
+		add.setTooltip(new Tooltip("Create new tab"));
 
 		home = createButton(Icon.HOME, 20, 20);
 		home.setTooltip(new Tooltip("Go to the main page"));
@@ -219,9 +232,7 @@ public class WebToolBar extends VBox {
 
 		});
 
-		downloads = new Button();
-		
-		IconUtils.setGraphic(downloads, Icon.DOWNLOADS);
+		downloads = createButton(Icon.DOWNLOADS, 20, 20);
 		
 		downloads.setOnAction(e -> {
 			
@@ -231,13 +242,48 @@ public class WebToolBar extends VBox {
 		});
 		
 		downloads.setDisable(true);
-
-		widgets.getChildren().addAll(back, forward, refresh, add, home, currentURL, search, zoomLabel, downloads);
+		
+		menu = new Menu();
+		
+		IconUtils.setGraphic(menu, Icon.MENU);
+		
+		Menu bookmarks = new Menu("Bookmarks");
+		
+		updateBookmarksMenu(bookmarks);
+		
+		bookmarks.setOnAction(e -> updateBookmarksMenu(bookmarks));
+		
+		menu.getItems().add(bookmarks);
+		
+		MenuBar bar = new MenuBar(menu);
+		
+		bar.setStyle("-fx-background-color: transparent;");
+		
+		widgets.getChildren().addAll(back, forward, refresh, add, home, currentURL, addBookmark,
+				search, zoomLabel, downloads, bar);
 
 		getChildren().addAll(widgets, progress);
 		
 		init();
 
+	}
+	
+	private void updateBookmarksMenu(Menu bookmarks) {
+		
+		Bookmarks bm = Bookmarks.getBookmarks();
+		
+		bookmarks.getItems().clear();
+		
+		bm.forEach((name, url) -> {
+			
+			MenuItem item = new MenuItem(name+": "+url);
+			
+			item.setOnAction(event -> selectedTab.getManager().getEngine().load(url));
+			
+			bookmarks.getItems().add(item);
+			
+		});
+		
 	}
 
 	private Button createButton(Icon icon, double w, double h) {

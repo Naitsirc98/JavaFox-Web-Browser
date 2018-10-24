@@ -16,15 +16,13 @@ import javafx.concurrent.Worker.State;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
-import naitsirc98.javafox.app.config.UserConfig;
 import naitsirc98.javafox.app.services.HTTPHeadRequestService;
 import naitsirc98.javafox.app.services.downloads.DownloadService;
+import naitsirc98.javafox.app.user.config.UserConfig;
 
 public final class Download {
 	
 	public static void newDownload(final String url) {
-		
-		System.out.println("url = "+url);
 		
 		final Download download = new Download();
 		
@@ -85,6 +83,10 @@ public final class Download {
 	
 	public boolean isComplete() {
 		return service.get().getState() == State.SUCCEEDED;
+	}
+	
+	public boolean isCancelled() {
+		return service.get().getState() == State.CANCELLED;
 	}
 
 

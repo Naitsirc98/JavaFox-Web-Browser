@@ -44,7 +44,7 @@ public final class DownloadManager {
 	}
 	
 	public long pendingDownloads() {
-		return downloads.stream().filter(d -> !d.isComplete()).count();
+		return downloads.stream().filter(d -> !(d.isComplete() || d.isCancelled())).count();
 	}
 	
 	public void display(double x, double y) {

@@ -22,12 +22,12 @@ import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import naitsirc98.javafox.app.config.UserConfig;
 import naitsirc98.javafox.app.gui.WebToolBar;
 import naitsirc98.javafox.app.gui.tabs.WebTab;
+import naitsirc98.javafox.app.user.bookmarks.Bookmarks;
+import naitsirc98.javafox.app.user.config.UserConfig;
 import naitsirc98.javafox.app.util.Icon;
 import naitsirc98.javafox.app.web.downloads.DownloadManager;
 
@@ -49,7 +49,7 @@ public class JavaFox extends Application {
 	}
 	
 	private Stage window;
-	private Pane root;
+	private BorderPane root;
 	private TabPane tabs;
 
 	public JavaFox() {
@@ -68,7 +68,7 @@ public class JavaFox extends Application {
 		
 		stage.setTitle("JavaFox");
 		
-		root = new StackPane();
+		root = new BorderPane();
 		
 		tabs = new TabPane();
 		
@@ -76,7 +76,7 @@ public class JavaFox extends Application {
 
 		tabs.getStylesheets().add(JavaFox.class.getResource("/css/styles.css").toExternalForm());
 		
-		root.getChildren().add(new StackPane(tabs));
+		root.setCenter(tabs);
 		
 		Scene scene = new Scene(root);
 		
@@ -204,6 +204,8 @@ public class JavaFox extends Application {
 			}
 			
 		}
+		
+		Bookmarks.getBookmarks().save();
 		
 		UserConfig.getConfig().save();
 		
