@@ -5,10 +5,8 @@ Features:
 - Navigable multitab view
 - PDF viewer (PDF.js)
 - Downloading files support
+- List of your current downloads
+- Bookmarks
 
 Alert dialogs added when:
 - You try to exit the application while there are downloads still in progress
-
-Improvements:
-
-- Now you can see a list of your downloads and its state by clicking on the 'Downloads' button in the ToolBar.
